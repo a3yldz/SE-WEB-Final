@@ -6,8 +6,8 @@ import authService from '../services/authService';
 import { usePageTitle } from '../hooks/usePageTitle';
 
 export function AuthScreen() {
-    usePageTitle('Login');
     const [isLogin, setIsLogin] = useState(true);
+    usePageTitle(isLogin ? 'Login' : 'Register');
 
     const [formData, setFormData] = useState({
         name: '',
