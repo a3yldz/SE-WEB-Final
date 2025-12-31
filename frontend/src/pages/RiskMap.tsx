@@ -38,7 +38,10 @@ function MapController({ center, zoom }: { center: [number, number], zoom: numbe
     return null;
 }
 
+import { usePageTitle } from '../hooks/usePageTitle';
+
 export function RiskMap() {
+    usePageTitle('Risk Analysis Map');
     const [data, setData] = useState<RiskPoint[]>([]);
     const [geoJsonData, setGeoJsonData] = useState<any>(null);
     const [selectedRisk, setSelectedRisk] = useState<'All' | 'High' | 'Medium' | 'Low'>('All');
@@ -62,7 +65,7 @@ export function RiskMap() {
         try {
             const response = await api.get(`/api/risk-analysis?city=${city}`);
             const responseData = response.data;
-            console.log("Raw API Response:", responseData); 
+            console.log("Raw API Response:", responseData);
             if (responseData && responseData.points) {
                 console.log("✅ Parsed Points (New Format):", responseData.points.length);
                 setData(responseData.points);
@@ -82,7 +85,7 @@ export function RiskMap() {
     };
 
     const handleCityClick = (feature: any) => {
-        const rawCityName = feature.properties.name; 
+        const rawCityName = feature.properties.name;
 
         const cityMapping: Record<string, string> = {
             'İstanbul': 'istanbul',
@@ -96,7 +99,7 @@ export function RiskMap() {
 
         if (backendKey) {
             console.log(`🗺️ City Clicked: ${rawCityName} -> Backend Key: ${backendKey}`);
-            setSelectedCity(rawCityName); 
+            setSelectedCity(rawCityName);
 
             let newCenter: [number, number] = [39.0, 35.0];
             let newZoom = 10;
@@ -171,7 +174,7 @@ export function RiskMap() {
                 )}
 
                 {filteredData.map((point, index) => {
-                    if (index < 3) console.log(`📍 Rendering Point [${index}]:`, point); 
+                    if (index < 3) console.log(`📍 Rendering Point [${index}]:`, point);
                     const score = point.score || 0;
                     const color = score > 70 ? '#ef4444' : score > 40 ? '#f97316' : '#22c55e';
                     const radius = score > 70 ? 40 : score > 40 ? 35 : 30;

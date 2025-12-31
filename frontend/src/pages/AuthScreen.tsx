@@ -3,7 +3,10 @@ import { Mail, Lock, User, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
+import { usePageTitle } from '../hooks/usePageTitle';
+
 export function AuthScreen() {
+    usePageTitle('Login');
     const [isLogin, setIsLogin] = useState(true);
 
     const [formData, setFormData] = useState({
