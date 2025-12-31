@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
 from app.db import Base
+from datetime import datetime, timezone
 
 class FireReport(Base):
     __tablename__ = "fire_reports"
@@ -13,7 +13,7 @@ class FireReport(Base):
     location = Column(String, nullable=True)
     image_url = Column(String, nullable=True)
     status = Column(String, default="pending")
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+    updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
     
     user = relationship("User", back_populates="fire_reports")

@@ -1,6 +1,6 @@
 from sqlalchemy import Column, String, Float, DateTime
-from sqlalchemy.sql import func
 from app.db import Base
+from datetime import datetime, timezone
 import uuid
 
 class SmokeDetection(Base):
@@ -13,4 +13,4 @@ class SmokeDetection(Base):
     district = Column(String, nullable=True)
     risk_score = Column(Float, nullable=True)
     status = Column(String, default="detected")
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))

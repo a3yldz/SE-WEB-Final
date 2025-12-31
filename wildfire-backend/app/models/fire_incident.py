@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
 from app.db import Base
+from datetime import datetime, timezone
 import uuid
 
 class FireIncident(Base):
@@ -15,7 +15,7 @@ class FireIncident(Base):
     status = Column(String, default="active")
     reported_by = Column(String, ForeignKey("users.id"), nullable=True)
     assigned_station_id = Column(String, ForeignKey("fire_stations.id"), nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     
     fire_station = relationship("FireStation", back_populates="fire_incidents")
     user = relationship("User", back_populates="fire_incidents")
