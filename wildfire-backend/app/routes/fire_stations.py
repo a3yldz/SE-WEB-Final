@@ -10,7 +10,6 @@ import uuid
 
 router = APIRouter()
 
-# Schemas
 class FireStationCreate(BaseModel):
     name: str
     district: str

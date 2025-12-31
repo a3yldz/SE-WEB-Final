@@ -21,7 +21,6 @@ export function useRiskData() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Simulate API fetch
         const timer = setTimeout(() => {
             setData(MOCK_DATA);
             setLoading(false);

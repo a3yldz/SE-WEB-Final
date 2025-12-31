@@ -12,7 +12,6 @@ export function AnimatedCounter({ value, duration = 1.5 }: { value: number, dura
             const progress = timestamp - startTime;
             const progressRatio = Math.min(progress / (duration * 1000), 1);
 
-            // Ease out cubic
             const ease = 1 - Math.pow(1 - progressRatio, 3);
 
             setCount(Math.floor(ease * value));

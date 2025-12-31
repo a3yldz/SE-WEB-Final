@@ -6,7 +6,6 @@ import math
 import logging
 from datetime import datetime, timedelta
 
-# Configure logging
 logger = logging.getLogger(__name__)
 
 class OpenMeteoService:
@@ -14,8 +13,6 @@ class OpenMeteoService:
     Service to fetch weather data from Open-Meteo API using the official SDK.
     """
     def __init__(self):
-        # Setup the Open-Meteo API client with cache and retry on error
-        # Using a local cache file '.cache' to reduce API calls
         cache_session = requests_cache.CachedSession('.cache', expire_after=3600)
         retry_session = retry(cache_session, retries=5, backoff_factor=0.2)
         self.openmeteo = openmeteo_requests.Client(session=retry_session)
@@ -37,31 +34,13 @@ class OpenMeteoService:
             "timezone": "auto"
         }
 
-        # Run synchronous SDK call in a separate thread
         try:
             responses = await asyncio.to_thread(
                 self.openmeteo.weather_api, self.url, params=params
             )
             response = responses[0]
             
-            # Process Current Data
             current = response.Current()
-            
-            # Mapping SDK variables by index (order matters and must match params list)
-            # The SDK doesn't provide a dict by name directly from .Current(), we must access by index or alias if wrapper supports it.
-            # However, looking at SDK examples, we usually get values by index corresponding to the request.
-            # Or properly using the Variables() method.
-            
-            # To be safe and readable, let's map carefully.
-            # The order in "current" list:
-            # 0: temperature_2m
-            # 1: relative_humidity_2m
-            # 2: wind_speed_10m
-            # 3: wind_gusts_10m
-            # 4: shortwave_radiation
-            # 5: precipitation
-            # 6: soil_moisture_0_to_1cm
-            # 7: vapour_pressure_deficit
             
             current_data = {
                 "temperature_2m": current.Variables(0).Value(),
@@ -74,20 +53,14 @@ class OpenMeteoService:
                 "vapour_pressure_deficit": current.Variables(7).Value(),
             }
 
-            # Process Hourly Data (Generic structures for compatibility)
-            # We only really need it if we want to support offset lookups
             hourly = response.Hourly()
             hourly_data = {
                 "time": [datetime.fromtimestamp(hourly.Time() + i * hourly.Interval()).isoformat() 
-                         for i in range(hourly.Variables(0).ValuesAsNumpy().size)], # fallback to range if pandas not used
+                         for i in range(hourly.Variables(0).ValuesAsNumpy().size)],
                 "temperature_2m": hourly.Variables(0).ValuesAsNumpy().tolist(),
                 "relative_humidity_2m": hourly.Variables(1).ValuesAsNumpy().tolist(),
                 "precipitation": hourly.Variables(3).ValuesAsNumpy().tolist() 
             }
-            # Note: ValuesAsNumpy requires pandas/numpy usually? 
-            # If pandas is not installed, openmeteo-sdk might return something else?
-            # Actually openmeteo-sdk depends on numpy. 
-            # We can convert numpy arrays to lists for JSON serializability constant with previous implementation.
 
             return {
                 "current": current_data,
@@ -111,7 +84,6 @@ class OpenMeteoService:
         """
         Extracts features from the result of get_forecast.
         """
-        # Default values
         temp = 20.0
         rh = 60.0
         wind_speed = 5.0

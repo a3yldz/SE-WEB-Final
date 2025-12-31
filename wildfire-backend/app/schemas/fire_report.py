@@ -3,13 +3,12 @@ from typing import Optional
 from datetime import datetime
 from uuid import UUID
 
-# Request schemas
 class FireReportCreate(BaseModel):
     title: str
     description: Optional[str] = None
     location: Optional[str] = None
     image_url: Optional[str] = None
-    user_id: Optional[UUID] = None  # Arkadaş auth yapınca zorunlu olacak
+    user_id: Optional[UUID] = None
 
 class FireReportUpdate(BaseModel):
     title: Optional[str] = None
@@ -18,7 +17,6 @@ class FireReportUpdate(BaseModel):
     image_url: Optional[str] = None
     status: Optional[str] = None
 
-# Response schemas
 class FireReportResponse(BaseModel):
     id: int
     user_id: Optional[UUID] = None
@@ -31,4 +29,4 @@ class FireReportResponse(BaseModel):
     updated_at: datetime
 
     class Config:
-        from_attributes = True  # SQLAlchemy model -> Pydantic
+        from_attributes = True 

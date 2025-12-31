@@ -30,7 +30,6 @@ export function SmokeLogs() {
     const fetchData = async () => {
         setLoading(true);
         try {
-            // Build URL with filter
             let url = '/api/admin/smoke-detections';
             if (filter === 'high') url += '?min_risk=70';
             else if (filter === 'medium') url += '?min_risk=40';
@@ -42,7 +41,6 @@ export function SmokeLogs() {
 
             let data = detectionsRes.data;
 
-            // Client-side filter for medium (40-70) and low (<40)
             if (filter === 'medium') {
                 data = data.filter((d: SmokeDetection) => d.risk_score && d.risk_score >= 40 && d.risk_score < 70);
             } else if (filter === 'low') {

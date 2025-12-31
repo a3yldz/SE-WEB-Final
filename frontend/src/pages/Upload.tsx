@@ -22,7 +22,6 @@ export function Upload() {
     const [result, setResult] = useState<AnalysisResult | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // Location inputs
     const [city, setCity] = useState('');
     const [district, setDistrict] = useState('');
 
@@ -54,7 +53,6 @@ export function Upload() {
             const formData = new FormData();
             formData.append('file', selectedFile);
 
-            // Build URL with query params for location data
             let url = '/api/smoke/detect';
             const params = new URLSearchParams();
             if (city) params.append('city', city);

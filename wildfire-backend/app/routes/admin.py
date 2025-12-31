@@ -66,7 +66,6 @@ async def delete_user_by_admin(
     current_admin: User = Depends(get_current_admin)
 ):
     """Delete a user (Admin only)."""
-    # Prevent admin from deleting themselves
     if user_id == current_admin.id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

@@ -10,7 +10,6 @@ from app.models.smoke_detection import SmokeDetection
 
 router = APIRouter()
 
-# Response Schema
 class SmokeDetectionResponse(BaseModel):
     id: str
     image_url: Optional[str] = None
@@ -55,18 +54,14 @@ def get_smoke_detections(
     """
     query = db.query(SmokeDetection)
     
-    # Filter by minimum risk score (convert to 0-1 scale for DB)
     if min_risk is not None:
-        min_risk_db = min_risk / 100.0  # Convert 70% -> 0.7
+        min_risk_db = min_risk / 100.0
         query = query.filter(SmokeDetection.risk_score >= min_risk_db)
     
-    # Order by newest first
     query = query.order_by(desc(SmokeDetection.created_at))
     
-    # Apply pagination
     detections = query.offset(skip).limit(limit).all()
     
-    # Convert risk_score back to 0-100 scale for response
     result = []
     for d in detections:
         result.append({
@@ -75,7 +70,7 @@ def get_smoke_detections(
             "latitude": float(d.latitude) if d.latitude else None,
             "longitude": float(d.longitude) if d.longitude else None,
             "district": d.district,
-            "risk_score": float(d.risk_score) * 100 if d.risk_score else None,  # Convert to %
+            "risk_score": float(d.risk_score) * 100 if d.risk_score else None,
             "status": d.status,
             "created_at": d.created_at
         })
@@ -103,7 +98,6 @@ def get_smoke_detection_stats(db: Session = Depends(get_db), current_user: Any =
     }
 
 
-# --- Approve & Create Incident Endpoint ---
 from app.models.fire_incident import FireIncident
 from app.models.fire_station import FireStation
 import uuid
@@ -136,7 +130,6 @@ def approve_smoke_detection(
     4. Assign station to incident
     5. Update detection status to 'confirmed'
     """
-    # Get detection
     detection = db.query(SmokeDetection).filter(SmokeDetection.id == detection_id).first()
     if not detection:
         raise HTTPException(status_code=404, detail="Smoke detection not found")
@@ -144,8 +137,6 @@ def approve_smoke_detection(
     if detection.status == "confirmed":
         raise HTTPException(status_code=400, detail="Detection already confirmed")
     
-    # Create new fire incident from detection
-    # Note: reported_by uses current_user.id (the approving admin), not detection.id
     incident = FireIncident(
         id=str(uuid.uuid4()),
         district=detection.district or "Unknown",
@@ -153,11 +144,10 @@ def approve_smoke_detection(
         latitude=float(detection.latitude) if detection.latitude else None,
         longitude=float(detection.longitude) if detection.longitude else None,
         status="active",
-        reported_by=str(current_user.id) if current_user else None  # Admin who approved
+        reported_by=str(current_user.id) if current_user else None
     )
     db.add(incident)
     
-    # Find nearest available station
     available_stations = db.query(FireStation).filter(FireStation.status == "available").all()
     
     nearest_station = None
@@ -174,12 +164,10 @@ def approve_smoke_detection(
                     min_distance = distance
                     nearest_station = station
     
-    # Assign station if found
     if nearest_station:
         incident.assigned_station_id = nearest_station.id
         nearest_station.status = "dispatched"
     
-    # Update detection status
     detection.status = "confirmed"
     
     db.commit()

@@ -14,7 +14,6 @@ class DroughtService:
             
         now = datetime.now()
         
-        # Combine time and precip, filter for past only, sort by time specific descending (most recent first)
         past_weather = []
         for i, t_str in enumerate(times):
             try:
@@ -24,7 +23,6 @@ class DroughtService:
             except ValueError:
                 continue
                 
-        # Sort descending by time
         past_weather.sort(key=lambda x: x[0], reverse=True)
         
         dry_hours = 0
@@ -34,7 +32,6 @@ class DroughtService:
             else:
                 break
                 
-        # Convert hours to days
         return dry_hours // 24
     def get_drought_factor(self, dry_days: int) -> float:
         if dry_days <= 2:

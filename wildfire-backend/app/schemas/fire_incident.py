@@ -4,7 +4,6 @@ from datetime import datetime
 from uuid import UUID
 from decimal import Decimal
 
-# Request schemas
 class FireIncidentCreate(BaseModel):
     address: Optional[str] = None
     district: str
@@ -22,7 +21,6 @@ class FireIncidentUpdate(BaseModel):
     status: Optional[str] = None
     assigned_station_id: Optional[UUID] = None
 
-# Response schemas
 class FireIncidentResponse(BaseModel):
     id: UUID
     address: Optional[str] = None

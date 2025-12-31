@@ -4,7 +4,6 @@ from datetime import datetime
 from uuid import UUID
 from decimal import Decimal
 
-# Request schemas
 class FireStationCreate(BaseModel):
     name: str
     district: str
@@ -19,7 +18,6 @@ class FireStationUpdate(BaseModel):
     longitude: Optional[Decimal] = None
     status: Optional[str] = None
 
-# Response schemas
 class FireStationResponse(BaseModel):
     id: UUID
     name: str

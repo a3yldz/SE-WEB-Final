@@ -5,7 +5,6 @@ import api from '../services/api';
 import { LiveConsole } from '../components/LiveConsole';
 import { AnimatedCounter } from '../components/AnimatedCounter';
 
-// Types matching backend API response
 interface FireStation {
     id: string;
     name: string;
@@ -42,21 +41,18 @@ interface SmokeDetection {
 export function FireDept() {
     const [activeTab, setActiveTab] = useState<'overview' | 'units' | 'history' | 'smoke-logs'>('overview');
 
-    // Data States
     const [stations, setStations] = useState<FireStation[]>([]);
     const [incidents, setIncidents] = useState<FireIncident[]>([]);
     const [missions, setMissions] = useState<SmokeDetection[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Pagination & Filter States
     const [totalIncidents, setTotalIncidents] = useState(0);
     const [currentSkip, setCurrentSkip] = useState(0);
     const [loadingMore, setLoadingMore] = useState(false);
     const [cityFilter, setCityFilter] = useState<'all' | 'izmir' | 'ankara' | 'istanbul'>('all');
     const ITEMS_PER_PAGE = 100;
 
-    // Modal States
     const [showAddStationModal, setShowAddStationModal] = useState(false);
     const [selectedMission, setSelectedMission] = useState<SmokeDetection | null>(null);
     const [dispatchingId, setDispatchingId] = useState<string | null>(null);
@@ -67,16 +63,13 @@ export function FireDept() {
     const [broadcasting, setBroadcasting] = useState(false);
     const [broadcastMessage, setBroadcastMessage] = useState('');
 
-    // Toast state
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
-    // Show toast helper
     const showToast = (message: string, type: 'success' | 'error' = 'success') => {
         setToast({ message, type });
         setTimeout(() => setToast(null), 3000);
     };
 
-    // New Station Form
     const [newStation, setNewStation] = useState({
         name: '',
         district: '',
@@ -85,7 +78,6 @@ export function FireDept() {
         status: 'available'
     });
 
-    // Fetch incidents with optional city filter
     const fetchIncidents = async (skip: number = 0, city?: string, append: boolean = false) => {
         try {
             let url = `/api/fire-incidents?skip=${skip}&limit=${ITEMS_PER_PAGE}`;
@@ -107,7 +99,6 @@ export function FireDept() {
         }
     };
 
-    // Fetch from REAL database-backed endpoints
     useEffect(() => {
         const fetchData = async () => {
             console.log("[FireDept] Starting data fetch...");
@@ -120,7 +111,6 @@ export function FireDept() {
                 console.log("[FireDept] Stations Data:", stationsRes.data);
                 console.log("[FireDept] Missions Data:", missionsRes.data);
 
-                // Ensure data is array, fallback to empty array
                 setStations(Array.isArray(stationsRes.data) ? stationsRes.data : []);
                 setMissions(Array.isArray(missionsRes.data) ? missionsRes.data : []);
 
@@ -131,7 +121,6 @@ export function FireDept() {
                 console.error("[FireDept] Failed to fetch data:", err);
                 console.error("[FireDept] Error details:", err?.response?.data || err?.message);
                 setError(`Connection failed: ${err?.message || 'Unknown error'}`);
-                // Set empty arrays to prevent undefined errors
                 setStations([]);
                 setMissions([]);
                 setIncidents([]);
@@ -143,14 +132,12 @@ export function FireDept() {
         fetchData();
     }, []);
 
-    // Refetch when city filter changes
     useEffect(() => {
         if (!loading) {
             fetchIncidents(0, cityFilter === 'all' ? undefined : cityFilter);
         }
     }, [cityFilter]);
 
-    // Load More handler
     const handleLoadMore = async () => {
         setLoadingMore(true);
         const newSkip = currentSkip + ITEMS_PER_PAGE;
@@ -158,7 +145,6 @@ export function FireDept() {
         setLoadingMore(false);
     };
 
-    // Refresh all data after actions
     const refreshAllData = async () => {
         try {
             const [stationsRes, missionsRes] = await Promise.all([
@@ -173,7 +159,6 @@ export function FireDept() {
         }
     };
 
-    // Add new station
     const handleAddStation = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -192,7 +177,6 @@ export function FireDept() {
         }
     };
 
-    // Approve smoke detection
     const handleApprove = async (detectionId: string) => {
         setApprovingId(detectionId);
         try {
@@ -208,7 +192,6 @@ export function FireDept() {
         }
     };
 
-    // Decline smoke detection (false alarm)
     const handleDecline = async (detectionId: string) => {
         setDecliningId(detectionId);
         try {
@@ -224,7 +207,6 @@ export function FireDept() {
         }
     };
 
-    // Dispatch station to incident
     const handleDispatch = async (incidentId: string) => {
         setDispatchingId(incidentId);
         try {
@@ -239,11 +221,9 @@ export function FireDept() {
         }
     };
 
-    // Simulate broadcast
     const handleBroadcast = async () => {
         if (!broadcastMessage.trim()) return;
         setBroadcasting(true);
-        // Simulate broadcast delay
         await new Promise(resolve => setTimeout(resolve, 2000));
         setBroadcasting(false);
         setShowBroadcast(false);
@@ -251,7 +231,6 @@ export function FireDept() {
         showToast(`📢 Broadcast sent to 1,245 devices!`, 'success');
     };
 
-    // Calculate stats dynamically from real data
     const stats = {
         active_incidents: incidents.filter(i => i.status === 'active').length,
         available_units: stations.filter(s => s.status === 'available').length,
@@ -773,7 +752,6 @@ function OverviewTab({
 }: OverviewTabProps) {
     const activeIncidents = incidents.filter(i => i.status === 'active');
 
-    // Group incidents by city
     const groupedIncidents = {
         izmir: activeIncidents.filter(i => i.district.toLowerCase().includes('izmir')),
         ankara: activeIncidents.filter(i => i.district.toLowerCase().includes('ankara')),
@@ -1033,7 +1011,6 @@ function HistoryTab({ incidents }: { incidents: FireIncident[] }) {
     );
 }
 
-// Smoke Logs Tab Component (Integrated & Styled)
 function SmokeLogsTab() {
     const [detections, setDetections] = useState<SmokeDetection[]>([]);
     const [loading, setLoading] = useState(true);

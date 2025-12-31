@@ -13,7 +13,6 @@ class FireStation(BaseModel):
     personnel: int
     vehicles: int
 
-# Mock data
 STATIONS = [
     {"id": "1", "name": "Kadikoy Central Station", "lat": 40.9833, "lng": 29.0277, "status": "Active", "personnel": 24, "vehicles": 5},
     {"id": "2", "name": "Uskudar Response Unit", "lat": 41.0260, "lng": 29.0160, "status": "Available", "personnel": 18, "vehicles": 3},
