@@ -12,5 +12,5 @@ class SmokeDetection(Base):
     longitude = Column(Float, nullable=True)
     district = Column(String, nullable=True)
     risk_score = Column(Float, nullable=True)
-    status = Column(String, default="detected")  # detected, confirmed, false_positive
+    status = Column(String, default="detected")
     created_at = Column(DateTime(timezone=True), server_default=func.now())

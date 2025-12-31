@@ -8,7 +8,7 @@ from app.models.fire_report import FireReport
 
 router = APIRouter()
 
-# Schemas
+
 class FireReportCreate(BaseModel):
     title: str
     description: Optional[str] = None

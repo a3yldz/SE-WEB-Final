@@ -10,7 +10,6 @@ router = APIRouter()
 def register(user_data: UserCreate, db: Session = Depends(get_db)):
     """Register a new user."""
     try:
-        # Pass the UserCreate object directly to the service
         user = register_user(db=db, user_data=user_data)
         return user
     except ValueError as e:
@@ -18,10 +17,7 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 def login(credentials: UserLogin, db: Session = Depends(get_db)):
-    """Login and get JWT access token."""
-    # Pass the UserLogin object directly to the service (create one if needed, but service expects UserLogin)
-    # Wait, checking service signature: def login_user(db: Session, login_data: UserLogin)
-    
+    """Login and get JWT access token."""    
     result = login_user(db=db, login_data=credentials)
     if not result:
         raise HTTPException(

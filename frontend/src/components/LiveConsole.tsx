@@ -24,7 +24,6 @@ export function LiveConsole({ className, logs = DEFAULT_LOGS }: LiveConsoleProps
     const [currentLogIndex, setCurrentLogIndex] = useState(0);
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    // Auto-typing simulator
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentLogIndex((prev) => (prev + 1) % logs.length);
@@ -39,18 +38,16 @@ export function LiveConsole({ className, logs = DEFAULT_LOGS }: LiveConsoleProps
 
             setDisplayLogs((prev) => {
                 const newLog = `> ${timestamp} ${logs[currentLogIndex]}`;
-                // Keep last 15 lines
                 const updated = [...prev, newLog];
                 if (updated.length > 15) updated.shift();
                 return updated;
             });
 
-        }, 2200); // New log every 2.2 seconds
+        }, 2200);
 
         return () => clearInterval(interval);
     }, [currentLogIndex, logs]);
 
-    // Auto-scroll
     useEffect(() => {
         if (scrollRef.current) {
             scrollRef.current.scrollTop = scrollRef.current.scrollHeight;

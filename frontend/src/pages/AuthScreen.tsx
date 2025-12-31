@@ -32,14 +32,6 @@ export function AuthScreen() {
                     password: formData.password,
                     full_name: `${formData.name} ${formData.surname}`.trim()
                 });
-                // Auto login after register or just switch to login?
-                // For better UX, let's auto login or at least prefill. 
-                // Let's switch to login for simplicity and clarity unless backend auto-logins.
-                // The requirements say "redirect to map or dashboard after login". 
-                // Register flow usually redirects to login or auto-logins. 
-                // Let's just try to login immediately after register if possible, or tell user to login.
-                // authService.register returns user object, not token. So we need to login separately or ask user to login.
-                // I'll switch to login view and show success message.
                 setIsLogin(true);
                 alert("Account created successfully! Please sign in.");
             }

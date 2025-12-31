@@ -10,7 +10,6 @@ import uuid
 
 router = APIRouter()
 
-# Schemas
 class FireIncidentCreate(BaseModel):
     district: str
     address: Optional[str] = None
@@ -73,14 +72,11 @@ def get_fire_incidents(
     """
     query = db.query(FireIncident)
     
-    # Filter by city if provided (case-insensitive partial match on district)
     if city:
         query = query.filter(FireIncident.district.ilike(f"%{city}%"))
     
-    # Get total count before pagination
     total = query.count()
     
-    # Apply pagination and fetch
     incidents = query.order_by(FireIncident.created_at.desc()).offset(skip).limit(limit).all()
     
     return {
@@ -124,14 +120,12 @@ def delete_fire_incident(incident_id: str, db: Session = Depends(get_db), curren
     db.commit()
     return {"message": "Fire incident deleted successfully"}
 
-
-# --- Smart Dispatch Endpoint ---
 from app.models.fire_station import FireStation
 import math
 
 def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     """Calculate the great-circle distance between two points on Earth (in km)."""
-    R = 6371  # Earth's radius in kilometers
+    R = 6371
     
     lat1_rad = math.radians(lat1)
     lat2_rad = math.radians(lat2)
@@ -159,7 +153,6 @@ def dispatch_to_nearest_station(
     4. Assign nearest station to incident
     5. Update station status to 'dispatched'
     """
-    # Get incident
     incident = db.query(FireIncident).filter(FireIncident.id == incident_id).first()
     if not incident:
         raise HTTPException(status_code=404, detail="Fire incident not found")
@@ -167,14 +160,12 @@ def dispatch_to_nearest_station(
     if incident.assigned_station_id:
         raise HTTPException(status_code=400, detail="Incident already has an assigned station")
     
-    # Get all available stations
     available_stations = db.query(FireStation).filter(FireStation.status == "available").all()
     
     if not available_stations:
         raise HTTPException(status_code=404, detail="No available fire stations")
     
-    # Find nearest station by distance
-    incident_lat = incident.latitude or 39.0  # Default Turkey center
+    incident_lat = incident.latitude or 39.0  
     incident_lon = incident.longitude or 35.0
     
     nearest_station = None
@@ -193,10 +184,7 @@ def dispatch_to_nearest_station(
     if not nearest_station:
         raise HTTPException(status_code=404, detail="Could not find a suitable station")
     
-    # Assign station to incident
     incident.assigned_station_id = nearest_station.id
-    
-    # Update station status to dispatched
     nearest_station.status = "dispatched"
     
     db.commit()

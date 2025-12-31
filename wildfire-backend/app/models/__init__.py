@@ -1,4 +1,3 @@
-# Import all models here so SQLAlchemy can resolve relationships
 from app.models.user import User
 from app.models.fire_station import FireStation
 from app.models.fire_incident import FireIncident

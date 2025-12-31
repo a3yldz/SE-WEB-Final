@@ -3,7 +3,6 @@ import { MapContainer, TileLayer, CircleMarker, Popup, GeoJSON, useMap } from 'r
 import { Search, AlertTriangle, X, Wind, Thermometer, Droplets, BrainCircuit, Loader2 } from 'lucide-react';
 import api from '../services/api';
 
-// Fix for Leaflet default icon issues in React
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -30,7 +29,6 @@ interface RiskPoint {
     score?: number;
 }
 
-// Map Controller for Pan/Zoom
 function MapController({ center, zoom }: { center: [number, number], zoom: number }) {
     const map = useMap();
     useEffect(() => {
@@ -47,12 +45,10 @@ export function RiskMap() {
     const [analyzingDistrict, setAnalyzingDistrict] = useState<RiskPoint | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    // Map State
-    const [mapCenter, setMapCenter] = useState<[number, number]>([39.0, 35.0]); // Default Turkey center roughly
+    const [mapCenter, setMapCenter] = useState<[number, number]>([39.0, 35.0]);
     const [mapZoom, setMapZoom] = useState(6);
     const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
-    // Initial Fetch (GeoJSON only - no default city load)
     useEffect(() => {
         fetch('/turkey_provinces.json')
             .then(res => res.json())
@@ -60,15 +56,13 @@ export function RiskMap() {
             .catch(err => console.error("Failed to load GeoJSON:", err));
     }, []);
 
-    // Risk Data Fetcher
     const fetchRiskData = async (city: string) => {
         console.log(`🚀 Fetching Risk Data for City: "${city}"`);
         setIsLoading(true);
         try {
             const response = await api.get(`/api/risk-analysis?city=${city}`);
-            // Handle new response structure: {city, points, max_risk, incident_created, incident_id}
             const responseData = response.data;
-            console.log("Raw API Response:", responseData); // 🔍 Debug Log
+            console.log("Raw API Response:", responseData); 
             if (responseData && responseData.points) {
                 console.log("✅ Parsed Points (New Format):", responseData.points.length);
                 setData(responseData.points);
@@ -88,9 +82,8 @@ export function RiskMap() {
     };
 
     const handleCityClick = (feature: any) => {
-        const rawCityName = feature.properties.name; // e.g., "İstanbul", "Ankara"
+        const rawCityName = feature.properties.name; 
 
-        // Normalize for backend matching (Turkish char handling)
         const cityMapping: Record<string, string> = {
             'İstanbul': 'istanbul',
             'Istanbul': 'istanbul',
@@ -103,9 +96,8 @@ export function RiskMap() {
 
         if (backendKey) {
             console.log(`🗺️ City Clicked: ${rawCityName} -> Backend Key: ${backendKey}`);
-            setSelectedCity(rawCityName); // Keep display name original
+            setSelectedCity(rawCityName); 
 
-            // Calculate center
             let newCenter: [number, number] = [39.0, 35.0];
             let newZoom = 10;
 
@@ -179,8 +171,7 @@ export function RiskMap() {
                 )}
 
                 {filteredData.map((point, index) => {
-                    if (index < 3) console.log(`📍 Rendering Point [${index}]:`, point); // 🔍 Debug first few points
-                    // Dynamic color based on score percentage
+                    if (index < 3) console.log(`📍 Rendering Point [${index}]:`, point); 
                     const score = point.score || 0;
                     const color = score > 70 ? '#ef4444' : score > 40 ? '#f97316' : '#22c55e';
                     const radius = score > 70 ? 40 : score > 40 ? 35 : 30;
@@ -317,10 +308,8 @@ export function RiskMap() {
     );
 }
 
-// ... AnalysisModal Component (Reuse existing) ...
 function AnalysisModal({ district, onClose }: { district: RiskPoint; onClose: () => void }) {
     const isHighRisk = district.riskLevel === 'High';
-    // Use new backend fields, fallback to defaults if missing
     const structuralScore = district.score || (isHighRisk ? 42 : 88);
     const temp = district.temp || 24;
     const wind = district.wind || 18;

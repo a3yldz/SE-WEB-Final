@@ -11,15 +11,12 @@ from dotenv import load_dotenv
 from app.models.smoke_detection import SmokeDetection
 from app.models.fire_report import FireReport
 
-# Load environment variables
 load_dotenv()
 
-# Roboflow Config
 ROBOFLOW_API_URL = "https://detect.roboflow.com"
 ROBOFLOW_API_KEY = "XoNbKefV5xjEal7LJ744"
 ROBOFLOW_MODEL_ID = "smoke-detection-5tkur/3"
 
-# Cloudinary Config (loaded from environment)
 CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
 CLOUDINARY_API_KEY = os.getenv("CLOUDINARY_API_KEY")
 CLOUDINARY_API_SECRET = os.getenv("CLOUDINARY_API_SECRET")
@@ -49,7 +46,6 @@ async def upload_to_cloudinary(file_content: bytes, filename: str) -> str:
             print(f"  API Secret: {'set' if CLOUDINARY_API_SECRET else 'None'}")
             return filename
         
-        # Upload to Cloudinary with a unique public_id
         result = cloudinary.uploader.upload(
             file_content,
             folder="smoke-detections",
@@ -65,7 +61,7 @@ async def upload_to_cloudinary(file_content: bytes, filename: str) -> str:
         print(f"[Cloudinary] ERROR: Upload failed - {type(e).__name__}: {e}")
         import traceback
         traceback.print_exc()
-        return filename  # Fallback to filename if upload fails
+        return filename 
 
 async def detect_smoke_service(
     file: UploadFile,
@@ -86,11 +82,9 @@ async def detect_smoke_service(
     contents = await file.read()
     print(f"[SmokeService] File received: {file.filename}, Size: {len(contents)} bytes")
     
-    # Step 1: Upload to Cloudinary
     image_url = await upload_to_cloudinary(contents, file.filename or "upload.jpg")
     print(f"[SmokeService] Image URL after upload: {image_url}")
     
-    # Step 2: Call Roboflow AI
     detect_url = f"{ROBOFLOW_API_URL}/{ROBOFLOW_MODEL_ID}"
     params = {"api_key": ROBOFLOW_API_KEY}
     files = {"file": (file.filename or "upload.jpg", contents, file.content_type or "application/octet-stream")}
@@ -100,7 +94,6 @@ async def detect_smoke_service(
         response.raise_for_status()
         result = response.json()
 
-    # Parse detections
     max_confidence = 0.0
     detections = []
     if result and "predictions" in result:
@@ -117,19 +110,17 @@ async def detect_smoke_service(
     risk_score = max_confidence * 100
     print(f"[SmokeService] Risk score: {risk_score}%")
     
-    # Combine city and district for location
     location_parts = [p for p in [city, district] if p]
     full_location = ", ".join(location_parts) if location_parts else None
     
-    # Step 3: Save detection to smoke_detections table
     detection_id = str(uuid.uuid4())
     smoke_detection = SmokeDetection(
         id=detection_id,
-        image_url=image_url,  # Cloudinary secure URL
+        image_url=image_url,
         latitude=latitude,
         longitude=longitude,
         district=full_location,
-        risk_score=max_confidence,  # Store as 0-1 scale
+        risk_score=max_confidence,
         status="detected"
     )
     db.add(smoke_detection)
@@ -137,7 +128,6 @@ async def detect_smoke_service(
     db.refresh(smoke_detection)
     print(f"[SmokeService] Saved detection: {detection_id}")
     
-    # Step 4: If risk > 50%, auto-create fire_report
     report_created = False
     report_id = None
     
@@ -146,7 +136,7 @@ async def detect_smoke_service(
             title="AI Auto-Generated Report",
             description=f"Smoke detected with {risk_score:.1f}% confidence at {full_location or 'Unknown Location'}.",
             location=full_location or "Unknown Location",
-            image_url=image_url,  # Cloudinary secure URL
+            image_url=image_url,
             status="pending"
         )
         db.add(fire_report)
@@ -156,7 +146,6 @@ async def detect_smoke_service(
         report_id = fire_report.id
         print(f"[SmokeService] Created fire report: {report_id}")
     
-    # Step 5: Return response with detection_id, report_id, and image_url
     return {
         "success": True,
         "risk_score": risk_score,

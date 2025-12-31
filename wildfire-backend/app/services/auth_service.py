@@ -8,7 +8,6 @@ from datetime import timedelta
 
 def register_user(db: Session, user_data: UserCreate) -> User:
     """Register a new user."""
-    # Check if user already exists
     existing_user = db.query(User).filter(User.email == user_data.email).first()
     if existing_user:
         raise HTTPException(
@@ -16,12 +15,10 @@ def register_user(db: Session, user_data: UserCreate) -> User:
             detail="Email already registered"
         )
     
-    # Validate role
     valid_roles = ["citizen", "admin", "firefighter"]
     if user_data.role not in valid_roles:
         user_data.role = "citizen"
     
-    # Create new user
     hashed_password = get_password_hash(user_data.password)
     db_user = User(
         email=user_data.email,
@@ -59,8 +56,7 @@ def login_user(db: Session, login_data: UserLogin) -> dict:
     """Login user and return access token."""
     user = authenticate_user(db, login_data.email, login_data.password)
     
-    # Create access token
-    access_token_expires = timedelta(minutes=60 * 24 * 7)  # 7 days
+    access_token_expires = timedelta(minutes=60 * 24 * 7)
     access_token = create_access_token(
         data={"sub": str(user.id), "email": user.email, "role": user.role},
         expires_delta=access_token_expires

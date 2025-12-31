@@ -12,9 +12,8 @@ class FireReport(Base):
     description = Column(String, nullable=True)
     location = Column(String, nullable=True)
     image_url = Column(String, nullable=True)
-    status = Column(String, default="pending")  # pending, confirmed, resolved, rejected
+    status = Column(String, default="pending")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
     
-    # Relationship
     user = relationship("User", back_populates="fire_reports")

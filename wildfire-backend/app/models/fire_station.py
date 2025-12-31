@@ -12,8 +12,7 @@ class FireStation(Base):
     district = Column(String, nullable=False)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
-    status = Column(String, default="available")  # available, dispatched, returning, maintenance
+    status = Column(String, default="available")
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
-    # Relationship
     fire_incidents = relationship("FireIncident", back_populates="fire_station")

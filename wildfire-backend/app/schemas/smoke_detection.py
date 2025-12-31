@@ -4,7 +4,6 @@ from datetime import datetime
 from uuid import UUID
 from decimal import Decimal
 
-# Request schemas
 class SmokeDetectionCreate(BaseModel):
     image_url: str
     latitude: Optional[Decimal] = None
@@ -13,7 +12,6 @@ class SmokeDetectionCreate(BaseModel):
     risk_score: Optional[Decimal] = None
     status: Optional[str] = "pending"
 
-# Response schemas
 class SmokeDetectionResponse(BaseModel):
     id: UUID
     image_url: str
