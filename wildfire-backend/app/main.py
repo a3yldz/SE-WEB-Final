@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import httpx
+import os
 
 from app.db import engine, Base
 
@@ -33,8 +34,8 @@ app = FastAPI(
     version="2.0.0",
     lifespan=lifespan
 )
-
-origins = ["http://localhost:5173", "http://127.0.0.1:5173", "*"]
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173")
+origins = ["http://localhost:5173", "http://127.0.0.1:5173", "*",FRONTEND_URL]
 
 app.add_middleware(
     CORSMiddleware,
