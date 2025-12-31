@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, Boolean, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.db import Base
+from datetime import datetime, timezone
 import uuid
 
 class User(Base):
@@ -12,7 +13,7 @@ class User(Base):
     password_hash = Column(String, nullable=False)
     full_name = Column(String, nullable=True)
     role = Column(String, default="user")
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     
     fire_incidents = relationship("FireIncident", back_populates="user")
     fire_reports = relationship("FireReport", back_populates="user")
