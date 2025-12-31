@@ -1,175 +1,286 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { Upload as UploadIcon, CheckCircle, AlertTriangle, FileImage, Loader2 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { Upload as UploadIcon, AlertCircle, CheckCircle2, Flame, Loader2, Image as ImageIcon, XCircle, MapPin } from 'lucide-react';
+import api from '../services/api';
+
+interface AnalysisResult {
+    success: boolean;
+    risk_score: number;
+    confidence: number;
+    detection_count: number;
+    detections: any[];
+    detection_id?: string;
+    image_url?: string;
+    report_created?: boolean;
+    report_id?: number;
+}
 
 export function Upload() {
-    const [file, setFile] = useState<File | null>(null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
-    const [analyzing, setAnalyzing] = useState(false);
-    const [result, setResult] = useState<{ score: number; risk: string; details: string[] } | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [result, setResult] = useState<AnalysisResult | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    // Location inputs
+    const [city, setCity] = useState('');
+    const [district, setDistrict] = useState('');
 
     const onDrop = useCallback((acceptedFiles: File[]) => {
-        const selected = acceptedFiles[0];
-        if (selected) {
-            setFile(selected);
-            setPreview(URL.createObjectURL(selected));
+        if (acceptedFiles.length > 0) {
+            const file = acceptedFiles[0];
+            setSelectedFile(file);
+            setPreview(URL.createObjectURL(file));
             setResult(null);
+            setError(null);
         }
     }, []);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop,
-        accept: { 'image/*': [] },
-        maxFiles: 1
+        accept: { 'image/*': ['.png', '.jpg', '.jpeg', '.webp'] },
+        maxFiles: 1,
+        multiple: false
     });
 
-    const handleAnalyze = () => {
-        if (!file) return;
-        setAnalyzing(true);
-        // Mock analysis
-        setTimeout(() => {
-            setAnalyzing(false);
-            setResult({
-                score: 72,
-                risk: 'High',
-                details: [
-                    'Detected significant crack in load-bearing pillar.',
-                    'Exposed reinforcement bars visible.',
-                    'Spalling observed in Area A.'
-                ]
+    const handleAnalyze = async () => {
+        if (!selectedFile) return;
+
+        setLoading(true);
+        setError(null);
+        setResult(null);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            // Build URL with query params for location data
+            let url = '/api/smoke/detect';
+            const params = new URLSearchParams();
+            if (city) params.append('city', city);
+            if (district) params.append('district', district);
+            if (params.toString()) url += `?${params.toString()}`;
+
+            const response = await api.post(url, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
             });
-        }, 2000);
+
+            setResult(response.data);
+        } catch (err: any) {
+            console.error('Analysis failed:', err);
+            setError(err.response?.data?.detail || 'Failed to analyze image. Please try again.');
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const clearFile = () => {
-        setFile(null);
+    const getRiskStatus = (score: number) => {
+        if (score > 70) return { label: 'CRITICAL: Smoke Detected', color: 'bg-red-600', textColor: 'text-red-400', icon: Flame };
+        if (score > 40) return { label: 'WARNING: Possible Smoke', color: 'bg-orange-500', textColor: 'text-orange-400', icon: AlertCircle };
+        return { label: 'SAFE: No Smoke Detected', color: 'bg-green-600', textColor: 'text-green-400', icon: CheckCircle2 };
+    };
+
+    const resetUpload = () => {
+        setSelectedFile(null);
         setPreview(null);
         setResult(null);
+        setError(null);
     };
 
     return (
-        <div className="max-w-4xl mx-auto px-4 py-12">
-            <div className="text-center mb-10">
-                <h1 className="text-3xl font-bold text-gray-900 mb-2">Structural Vulnerability Analysis</h1>
-                <p className="text-gray-500">Upload an image of a building column or wall to detect structural defects using AI.</p>
-            </div>
+        <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 pt-20 pb-12 px-4">
+            <div className="max-w-4xl mx-auto">
+                {/* Header */}
+                <div className="text-center mb-12">
+                    <div className="inline-flex items-center gap-3 bg-orange-500/20 text-orange-400 px-4 py-2 rounded-full text-sm font-medium mb-6 border border-orange-500/30">
+                        <Flame className="w-4 h-4" />
+                        AI-Powered Analysis
+                    </div>
+                    <h1 className="text-4xl font-bold text-white mb-4 tracking-tight">
+                        Smoke Detection Scanner
+                    </h1>
+                    <p className="text-slate-400 max-w-xl mx-auto">
+                        Upload an aerial or ground image and our AI will analyze it for signs of wildfire smoke using advanced computer vision.
+                    </p>
+                </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
-                    {/* Dropzone */}
-                    <div
-                        {...getRootProps()}
-                        className={cn(
-                            "border-2 border-dashed rounded-2xl h-80 flex flex-col items-center justify-center p-6 transition-all cursor-pointer relative overflow-hidden bg-gray-50",
-                            isDragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-blue-400",
-                            preview ? "border-solid border-gray-200" : ""
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Upload Area */}
+                    <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6 shadow-2xl">
+                        <h2 className="text-white font-semibold mb-4 flex items-center gap-2">
+                            <UploadIcon className="w-5 h-5 text-blue-400" />
+                            Upload Image
+                        </h2>
+
+                        {/* Location Inputs */}
+                        <div className="mb-4 space-y-3">
+                            <div className="flex items-center gap-2 text-slate-300 text-sm mb-2">
+                                <MapPin className="w-4 h-4 text-green-400" />
+                                Location Info (Optional)
+                            </div>
+                            <div className="grid grid-cols-2 gap-3">
+                                <input
+                                    type="text"
+                                    placeholder="City (e.g., Izmir)"
+                                    value={city}
+                                    onChange={(e) => setCity(e.target.value)}
+                                    className="bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                                <input
+                                    type="text"
+                                    placeholder="District (e.g., Buca)"
+                                    value={district}
+                                    onChange={(e) => setDistrict(e.target.value)}
+                                    className="bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-white text-sm placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                            </div>
+                        </div>
+
+                        <div
+                            {...getRootProps()}
+                            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 ${isDragActive
+                                ? 'border-blue-500 bg-blue-500/10'
+                                : 'border-white/20 hover:border-white/40 hover:bg-white/5'
+                                }`}
+                        >
+                            <input {...getInputProps()} />
+                            {preview ? (
+                                <div className="relative">
+                                    <img
+                                        src={preview}
+                                        alt="Preview"
+                                        className="max-h-64 mx-auto rounded-lg object-contain"
+                                    />
+                                    <button
+                                        onClick={(e) => { e.stopPropagation(); resetUpload(); }}
+                                        className="absolute top-2 right-2 p-1.5 bg-red-500/80 rounded-full hover:bg-red-600 transition-colors"
+                                    >
+                                        <XCircle className="w-4 h-4 text-white" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="py-8">
+                                    <ImageIcon className="w-16 h-16 text-slate-500 mx-auto mb-4" />
+                                    <p className="text-slate-300 font-medium mb-2">
+                                        {isDragActive ? 'Drop the image here...' : 'Drag & drop an image here'}
+                                    </p>
+                                    <p className="text-slate-500 text-sm">or click to select a file</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <button
+                            onClick={handleAnalyze}
+                            disabled={!selectedFile || loading}
+                            className={`w-full mt-6 py-3 px-6 rounded-xl font-semibold text-white transition-all duration-300 flex items-center justify-center gap-2 ${!selectedFile || loading
+                                ? 'bg-slate-700 cursor-not-allowed opacity-50'
+                                : 'bg-gradient-to-r from-orange-600 to-red-600 hover:from-orange-500 hover:to-red-500 shadow-lg shadow-orange-500/25'
+                                }`}
+                        >
+                            {loading ? (
+                                <>
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    Analyzing...
+                                </>
+                            ) : (
+                                <>
+                                    <Flame className="w-5 h-5" />
+                                    Analyze for Smoke
+                                </>
+                            )}
+                        </button>
+                    </div>
+
+                    {/* Results Area */}
+                    <div className="bg-white/5 backdrop-blur-lg border border-white/10 rounded-2xl p-6 shadow-2xl">
+                        <h2 className="text-white font-semibold mb-4 flex items-center gap-2">
+                            <AlertCircle className="w-5 h-5 text-purple-400" />
+                            Analysis Results
+                        </h2>
+
+                        {loading && (
+                            <div className="flex flex-col items-center justify-center h-64 text-slate-400">
+                                <Loader2 className="w-12 h-12 animate-spin text-orange-500 mb-4" />
+                                <p className="font-medium">AI is analyzing your image...</p>
+                                <p className="text-sm text-slate-500">This may take a few seconds</p>
+                            </div>
                         )}
-                    >
-                        <input {...getInputProps()} />
 
-                        {preview ? (
-                            <>
-                                <img src={preview} alt="Preview" className="w-full h-full object-cover rounded-lg" />
-                                <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-                                    <p className="text-white font-medium">Click to change image</p>
+                        {error && !loading && (
+                            <div className="flex flex-col items-center justify-center h-64 text-red-400">
+                                <XCircle className="w-12 h-12 mb-4" />
+                                <p className="font-medium">Analysis Failed</p>
+                                <p className="text-sm text-slate-500 text-center mt-2">{error}</p>
+                            </div>
+                        )}
+
+                        {result && !loading && (
+                            <div className="space-y-6">
+                                {/* Risk Score */}
+                                <div className="bg-black/30 rounded-xl p-6 border border-white/5">
+                                    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-bold mb-4 ${getRiskStatus(result.risk_score).color}`}>
+                                        {(() => {
+                                            const StatusIcon = getRiskStatus(result.risk_score).icon;
+                                            return <StatusIcon className="w-4 h-4" />;
+                                        })()}
+                                        {getRiskStatus(result.risk_score).label}
+                                    </div>
+
+                                    <div className="flex items-baseline gap-2">
+                                        <span className={`text-5xl font-bold ${getRiskStatus(result.risk_score).textColor}`}>
+                                            {result.risk_score.toFixed(1)}%
+                                        </span>
+                                        <span className="text-slate-500 text-sm">Risk Score</span>
+                                    </div>
+
+                                    <div className="w-full bg-slate-800 h-3 rounded-full mt-4 overflow-hidden">
+                                        <div
+                                            className={`h-full rounded-full transition-all duration-500 ${getRiskStatus(result.risk_score).color}`}
+                                            style={{ width: `${result.risk_score}%` }}
+                                        />
+                                    </div>
                                 </div>
-                            </>
-                        ) : (
-                            <div className="text-center">
-                                <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-600">
-                                    <UploadIcon className="w-8 h-8" />
+
+                                {/* Detection Details */}
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-black/20 rounded-lg p-4 border border-white/5">
+                                        <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Confidence</p>
+                                        <p className="text-white text-xl font-bold">{(result.confidence * 100).toFixed(1)}%</p>
+                                    </div>
+                                    <div className="bg-black/20 rounded-lg p-4 border border-white/5">
+                                        <p className="text-slate-400 text-xs uppercase tracking-wider mb-1">Detections</p>
+                                        <p className="text-white text-xl font-bold">{result.detection_count}</p>
+                                    </div>
                                 </div>
-                                <p className="text-lg font-medium text-gray-700">Drop image here or click to upload</p>
-                                <p className="text-sm text-gray-400 mt-2">Supports JPG, PNG (Max 10MB)</p>
+
+                                {/* Report Created Badge */}
+                                {result.report_created && (
+                                    <div className="bg-green-500/20 border border-green-500/30 rounded-lg p-4 flex items-center gap-3">
+                                        <CheckCircle2 className="w-5 h-5 text-green-400" />
+                                        <div>
+                                            <p className="text-green-400 font-medium text-sm">Fire Report Auto-Created</p>
+                                            <p className="text-slate-400 text-xs">Report ID: {result.report_id}</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Detection ID */}
+                                {result.detection_id && (
+                                    <div className="text-xs text-slate-500">
+                                        Detection ID: {result.detection_id}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {!loading && !error && !result && (
+                            <div className="flex flex-col items-center justify-center h-64 text-slate-500">
+                                <ImageIcon className="w-12 h-12 mb-4 opacity-50" />
+                                <p className="font-medium">No analysis yet</p>
+                                <p className="text-sm">Upload an image and click "Analyze"</p>
                             </div>
                         )}
                     </div>
-
-                    {/* Action Buttons */}
-                    {file && (
-                        <div className="mt-6 flex gap-4">
-                            <button
-                                onClick={clearFile}
-                                className="flex-1 py-3 px-4 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
-                                disabled={analyzing}
-                            >
-                                Clear
-                            </button>
-                            <button
-                                onClick={handleAnalyze}
-                                disabled={analyzing || !!result}
-                                className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {analyzing ? (
-                                    <>
-                                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                                        Analyzing...
-                                    </>
-                                ) : result ? 'Analysis Complete' : (
-                                    <>
-                                        Analyze Structure
-                                    </>
-                                )}
-                            </button>
-                        </div>
-                    )}
-                </div>
-
-                {/* Results Panel */}
-                <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-6">
-                    <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
-                        <FileImage className="w-5 h-5 mr-2 text-gray-500" />
-                        Analysis Results
-                    </h2>
-
-                    {!result && !analyzing && (
-                        <div className="h-64 flex flex-col items-center justify-center text-gray-400 border border-dashed border-gray-200 rounded-xl bg-gray-50/50">
-                            <p>No analysis data yet.</p>
-                            <p className="text-sm">Upload an image to start.</p>
-                        </div>
-                    )}
-
-                    {analyzing && (
-                        <div className="h-64 flex flex-col items-center justify-center">
-                            <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
-                            <p className="text-gray-600 font-medium">Processing image vectors...</p>
-                            <p className="text-xs text-gray-400 mt-2">Identifying structural patterns</p>
-                        </div>
-                    )}
-
-                    {result && (
-                        <div className="animate-in fade-in slide-in-from-bottom-5 duration-500">
-                            <div className="flex items-center justify-between mb-6 p-4 bg-red-50 border border-red-100 rounded-xl">
-                                <div>
-                                    <p className="text-sm text-red-600 font-semibold uppercase tracking-wider">Risk Score</p>
-                                    <p className="text-3xl font-bold text-red-700">{result.score}/100</p>
-                                </div>
-                                <div className="text-right">
-                                    <div className="inline-flex items-center px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm font-medium">
-                                        <AlertTriangle className="w-4 h-4 mr-1.5" />
-                                        {result.risk} Risk
-                                    </div>
-                                </div>
-                            </div>
-
-                            <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wider">Detected Issues</h3>
-                            <ul className="space-y-3">
-                                {result.details.map((detail, idx) => (
-                                    <li key={idx} className="flex items-start text-gray-700">
-                                        <CheckCircle className="w-5 h-5 text-red-500 mr-2 flex-shrink-0 mt-0.5" />
-                                        {detail}
-                                    </li>
-                                ))}
-                            </ul>
-
-                            <div className="mt-8 pt-6 border-t border-gray-100">
-                                <p className="text-xs text-gray-500 text-center">
-                                    ** This is an AI-assisted estimation. Please consult a civil engineer for official certification.
-                                </p>
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
         </div>

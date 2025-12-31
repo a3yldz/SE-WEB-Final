@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Mail, Lock, User, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { cn } from '../lib/utils';
-
+import { useNavigate } from 'react-router-dom';
+import authService from '../services/authService';
 export function AuthScreen() {
     const [isLogin, setIsLogin] = useState(true);
 
-    // Form states
     const [formData, setFormData] = useState({
         name: '',
         surname: '',
@@ -13,10 +13,46 @@ export function AuthScreen() {
         password: ''
     });
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Form submitted:', formData);
-        // TODO: Implement actual auth logic
+        setError(null);
+        setLoading(true);
+
+        try {
+            if (isLogin) {
+                await authService.login(formData.email, formData.password);
+                navigate('/');
+            } else {
+                await authService.register({
+                    email: formData.email,
+                    password: formData.password,
+                    full_name: `${formData.name} ${formData.surname}`.trim()
+                });
+                // Auto login after register or just switch to login?
+                // For better UX, let's auto login or at least prefill. 
+                // Let's switch to login for simplicity and clarity unless backend auto-logins.
+                // The requirements say "redirect to map or dashboard after login". 
+                // Register flow usually redirects to login or auto-logins. 
+                // Let's just try to login immediately after register if possible, or tell user to login.
+                // authService.register returns user object, not token. So we need to login separately or ask user to login.
+                // I'll switch to login view and show success message.
+                setIsLogin(true);
+                alert("Account created successfully! Please sign in.");
+            }
+        } catch (err: any) {
+            console.error('Auth error:', err);
+            setError(err.response?.data?.detail || 'Authentication failed. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     return (
@@ -70,6 +106,12 @@ export function AuthScreen() {
                         </p>
                     </div>
 
+                    {error && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                            {error}
+                        </div>
+                    )}
+
                     <form onSubmit={handleSubmit} className="space-y-6">
                         {!isLogin && (
                             <div className="grid grid-cols-2 gap-4">
@@ -79,6 +121,9 @@ export function AuthScreen() {
                                         <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                                         <input
                                             type="text"
+                                            name="name"
+                                            value={formData.name}
+                                            onChange={handleChange}
                                             placeholder="Ahmet"
                                             className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all"
                                             required
@@ -91,6 +136,9 @@ export function AuthScreen() {
                                         <User className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                                         <input
                                             type="text"
+                                            name="surname"
+                                            value={formData.surname}
+                                            onChange={handleChange}
                                             placeholder="Yilmaz"
                                             className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all"
                                             required
@@ -106,6 +154,9 @@ export function AuthScreen() {
                                 <Mail className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                                 <input
                                     type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
                                     placeholder="name@agency.gov.tr"
                                     className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all"
                                     required
@@ -119,6 +170,9 @@ export function AuthScreen() {
                                 <Lock className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                                 <input
                                     type="password"
+                                    name="password"
+                                    value={formData.password}
+                                    onChange={handleChange}
                                     placeholder="••••••••"
                                     className="w-full pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none transition-all"
                                     required
@@ -143,10 +197,20 @@ export function AuthScreen() {
 
                         <button
                             type="submit"
-                            className="w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 shadow-lg shadow-red-500/30 transition-all duration-200"
+                            disabled={loading}
+                            className={cn(
+                                "w-full flex justify-center items-center py-2.5 px-4 border border-transparent rounded-lg text-sm font-semibold text-white bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 shadow-lg shadow-red-500/30 transition-all duration-200",
+                                loading && "opacity-70 cursor-not-allowed"
+                            )}
                         >
-                            {isLogin ? 'Sign In' : 'Create Account'}
-                            <ArrowRight className="ml-2 h-4 w-4" />
+                            {loading ? (
+                                <span className="flex items-center gap-2">Processing...</span>
+                            ) : (
+                                <>
+                                    {isLogin ? 'Sign In' : 'Create Account'}
+                                    <ArrowRight className="ml-2 h-4 w-4" />
+                                </>
+                            )}
                         </button>
                     </form>
 

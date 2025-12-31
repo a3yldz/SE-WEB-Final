@@ -1,12 +1,16 @@
 import { Link } from 'react-router-dom';
-import { Map, Upload, ShieldAlert, Heart, ArrowRight } from 'lucide-react';
+import { Map, Upload, ShieldAlert, Users, ArrowRight } from 'lucide-react';
 import { cn } from '../lib/utils';
+import authService from '../services/authService';
 
 export function Home() {
+    const user = authService.getUser();
+
     return (
         <div className="flex flex-col min-h-[calc(100vh-4rem)]">
             {/* Hero Section */}
             <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
+                {/* ... existing hero section content ... */}
                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=2072&auto=format&fit=crop')] opacity-10 bg-cover bg-center" />
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 relative z-10">
                     <div className="md:w-2/3 lg:w-1/2">
@@ -58,19 +62,21 @@ export function Home() {
                             to="/upload"
                             color="text-purple-500"
                         />
+                        {user?.role === 'admin' && (
+                            <FeatureCard
+                                icon={ShieldAlert}
+                                title="Emergency Response"
+                                description="Command center for fire departments and emergency units."
+                                to="/fire-dept"
+                                color="text-red-500"
+                            />
+                        )}
                         <FeatureCard
-                            icon={ShieldAlert}
-                            title="Emergency Response"
-                            description="Command center for fire departments and emergency units."
-                            to="/fire-dept"
-                            color="text-red-500"
-                        />
-                        <FeatureCard
-                            icon={Heart}
-                            title="Donation Support"
-                            description="Direct channels to support affected areas and relief efforts."
+                            icon={Users}
+                            title="Volunteer Hub"
+                            description="Join the local volunteer network or report community hazards directly to the response teams."
                             to="/"
-                            color="text-pink-500"
+                            color="text-orange-500"
                             comingSoon
                         />
                     </div>
@@ -79,6 +85,7 @@ export function Home() {
         </div>
     );
 }
+
 
 function FeatureCard({
     icon: Icon,

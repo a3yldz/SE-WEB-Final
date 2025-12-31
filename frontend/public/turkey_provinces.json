@@ -1,0 +1,137 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Istanbul"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            28.0,
+                            41.0
+                        ],
+                        [
+                            29.5,
+                            41.0
+                        ],
+                        [
+                            29.5,
+                            41.6
+                        ],
+                        [
+                            28.0,
+                            41.6
+                        ],
+                        [
+                            28.0,
+                            41.0
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Ankara"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            32.0,
+                            39.0
+                        ],
+                        [
+                            33.5,
+                            39.0
+                        ],
+                        [
+                            33.5,
+                            40.5
+                        ],
+                        [
+                            32.0,
+                            40.5
+                        ],
+                        [
+                            32.0,
+                            39.0
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Izmir"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            26.5,
+                            38.0
+                        ],
+                        [
+                            27.5,
+                            38.0
+                        ],
+                        [
+                            27.5,
+                            39.0
+                        ],
+                        [
+                            26.5,
+                            39.0
+                        ],
+                        [
+                            26.5,
+                            38.0
+                        ]
+                    ]
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "Antalya"
+            },
+            "geometry": {
+                "type": "Polygon",
+                "coordinates": [
+                    [
+                        [
+                            30.0,
+                            36.0
+                        ],
+                        [
+                            31.5,
+                            36.0
+                        ],
+                        [
+                            31.5,
+                            37.5
+                        ],
+                        [
+                            30.0,
+                            37.5
+                        ],
+                        [
+                            30.0,
+                            36.0
+                        ]
+                    ]
+                ]
+            }
+        }
+    ]
+}
