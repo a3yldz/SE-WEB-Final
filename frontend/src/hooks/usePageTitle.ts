@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 export function usePageTitle(title: string) {
     useEffect(() => {
         const prevTitle = document.title;
-        document.title = `RescueApp | ${title}`;
+        document.title = `Wild Fire Alert | ${title}`;
 
         return () => {
             document.title = prevTitle;

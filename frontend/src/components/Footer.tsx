@@ -43,7 +43,7 @@ export function Footer() {
                 </div>
 
                 <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-slate-600">
-                    <p>&copy; 2024 Wildfire AI Rescue. All rights reserved.</p>
+                    <p>&copy; 2026 Wildfire AI Rescue. All rights reserved.</p>
                     <p>Designed for rapid emergency response.</p>
                 </div>
             </div>
