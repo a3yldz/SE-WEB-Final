@@ -1,0 +1,669 @@
+{
+    "info": {
+        "name": "Wildfire Backend API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Health",
+            "item": [
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/health",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "health"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Auth",
+            "item": [
+                {
+                    "name": "Register",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"strongpassword\",\n  \"full_name\": \"John Doe\",\n  \"role\": \"citizen\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "register"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"strongpassword\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "auth",
+                                "login"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Smoke Detection",
+            "item": [
+                {
+                    "name": "Detect Smoke",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": []
+                                },
+                                {
+                                    "key": "latitude",
+                                    "value": "38.4192",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "longitude",
+                                    "value": "27.1287",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "district",
+                                    "value": "Bornova",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "city",
+                                    "value": "Izmir",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/smoke/detect",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "smoke",
+                                "detect"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Risk Analysis",
+            "item": [
+                {
+                    "name": "Get Risk Analysis",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/risk-analysis?city=izmir",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "risk-analysis"
+                            ],
+                            "query": [
+                                {
+                                    "key": "city",
+                                    "value": "izmir"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Dashboard",
+            "item": [
+                {
+                    "name": "Get Stations (Mock)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/stations",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "stations"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Incidents (Mock)",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/incidents",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "incidents"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Dashboard Stats",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/dashboard-stats",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "dashboard-stats"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Fire Reports",
+            "item": [
+                {
+                    "name": "Create Fire Report",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Fire Reported at Central Park\",\n  \"description\": \"Large smoke plume visible\",\n  \"location\": \"Central Park, NY\",\n  \"image_url\": \"http://example.com/image.jpg\",\n  \"user_id\": \"optional-user-id\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-reports",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-reports"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Fire Reports",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-reports",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-reports"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Single Fire Report",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-reports/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-reports",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Fire Report",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"investigating\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-reports/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-reports",
+                                "1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Fire Report",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-reports/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-reports",
+                                "1"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Fire Incidents",
+            "item": [
+                {
+                    "name": "Create Fire Incident",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"district\": \"Bornova\",\n  \"address\": \"Kazim Dirik Mh.\",\n  \"latitude\": 38.46,\n  \"longitude\": 27.21,\n  \"status\": \"active\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-incidents",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-incidents"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Fire Incidents",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-incidents",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-incidents"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Single Fire Incident",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-incidents/{incident_id}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-incidents",
+                                "{incident_id}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Fire Incident",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"contained\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-incidents/{incident_id}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-incidents",
+                                "{incident_id}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Fire Incident",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-incidents/{incident_id}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-incidents",
+                                "{incident_id}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Dispatch Nearest Station",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-incidents/{incident_id}/dispatch",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-incidents",
+                                "{incident_id}",
+                                "dispatch"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Fire Stations",
+            "item": [
+                {
+                    "name": "Create Fire Station",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Bornova Central Station\",\n  \"district\": \"Bornova\",\n  \"latitude\": 38.46,\n  \"longitude\": 27.21,\n  \"status\": \"available\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-stations",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-stations"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Fire Stations",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-stations",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-stations"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Single Fire Station",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-stations/{station_id}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-stations",
+                                "{station_id}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Fire Station",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"status\": \"in-operation\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-stations/{station_id}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-stations",
+                                "{station_id}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Fire Station",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/fire-stations/{station_id}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "fire-stations",
+                                "{station_id}"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Admin - Smoke Logs",
+            "item": [
+                {
+                    "name": "Get Smoke Detections",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/smoke-detections?min_risk=70",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "smoke-detections"
+                            ],
+                            "query": [
+                                {
+                                    "key": "min_risk",
+                                    "value": "70"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Smoke Stats",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/smoke-detections/stats",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "smoke-detections",
+                                "stats"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Approve Detection",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/smoke-detections/{detection_id}/approve",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "smoke-detections",
+                                "{detection_id}",
+                                "approve"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Decline Detection",
+                    "request": {
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/smoke-detections/{detection_id}/decline",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "smoke-detections",
+                                "{detection_id}",
+                                "decline"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8000",
+            "type": "string"
+        }
+    ]
+}
