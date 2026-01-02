@@ -57,7 +57,7 @@ export function AuthScreen() {
                 <div className="relative z-10 flex flex-col justify-between p-12 text-white h-full w-full">
                     <div>
                         <span className="text-2xl font-bold bg-gradient-to-r from-red-500 to-orange-400 bg-clip-text text-transparent">
-                            RescueApp
+                            Wild Fire Alert
                         </span>
                     </div>
 
@@ -79,7 +79,7 @@ export function AuthScreen() {
                     </div>
 
                     <div className="text-sm text-slate-500">
-                        © 2024 RescueApp Disaster Management System
+                        © 2026 Wild Fire Alert Disaster Management System
                     </div>
                 </div>
             </div>

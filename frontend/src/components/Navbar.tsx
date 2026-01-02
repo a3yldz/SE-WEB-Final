@@ -49,8 +49,9 @@ export function Navbar() {
                 <div className="flex justify-between h-16">
                     <div className="flex">
                         <div className="flex-shrink-0 flex items-center">
+                            <img src="/wildfire.svg" alt="WildfirePro" className="h-8 w-auto mr-2" />
                             <span className="text-2xl font-bold bg-gradient-to-r from-red-600 to-orange-500 bg-clip-text text-transparent">
-                                RescueApp
+                                Wild Fire Alert
                             </span>
                         </div>
                         <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
