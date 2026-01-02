@@ -20,7 +20,10 @@ interface Stats {
     low_risk: number;
 }
 
+import { usePageTitle } from '../hooks/usePageTitle';
+
 export function SmokeLogs() {
+    usePageTitle('Smoke Detections');
     const [detections, setDetections] = useState<SmokeDetection[]>([]);
     const [stats, setStats] = useState<Stats | null>(null);
     const [loading, setLoading] = useState(true);
@@ -124,8 +127,8 @@ export function SmokeLogs() {
                                 key={f}
                                 onClick={() => setFilter(f)}
                                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === f
-                                        ? 'bg-purple-600 text-white'
-                                        : 'bg-white/5 text-slate-300 hover:bg-white/10'
+                                    ? 'bg-purple-600 text-white'
+                                    : 'bg-white/5 text-slate-300 hover:bg-white/10'
                                     }`}
                             >
                                 {f === 'all' ? 'All' : f === 'high' ? '🔴 Critical' : f === 'medium' ? '🟡 Warning' : '🟢 Low'}

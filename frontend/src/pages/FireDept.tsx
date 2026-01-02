@@ -38,7 +38,10 @@ interface SmokeDetection {
     created_at: string | null;
 }
 
+import { usePageTitle } from '../hooks/usePageTitle';
+
 export function FireDept() {
+    usePageTitle('Dashboard');
     const [activeTab, setActiveTab] = useState<'overview' | 'units' | 'history' | 'smoke-logs'>('overview');
 
     const [stations, setStations] = useState<FireStation[]>([]);

@@ -15,7 +15,10 @@ interface AnalysisResult {
     report_id?: number;
 }
 
+import { usePageTitle } from '../hooks/usePageTitle';
+
 export function Upload() {
+    usePageTitle('Smoke Scanner');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [preview, setPreview] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
